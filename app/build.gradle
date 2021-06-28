@@ -11,6 +11,7 @@ android {
         applicationId "com.codepath.apps.restclienttemplate"
         minSdkVersion 21
         targetSdkVersion 28
+        compileSdkVersion 28
 
         // Room schemas
         javaCompileOptions {
