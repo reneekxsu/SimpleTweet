@@ -2,6 +2,8 @@ package com.codepath.apps.restclienttemplate;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,6 +46,15 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setAdapter(adapter);
 
         populateHomeTimeline();
+
+        Button btnLogOut = findViewById(R.id.btnLogOut);
+        btnLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logOut();
+            }
+        });
+
     }
 
     private void populateHomeTimeline() {
@@ -66,5 +77,10 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.e(TAG,"onFailure" + response,throwable);
             }
         });
+    }
+
+    private void logOut(){
+        client.clearAccessToken();
+        finish();
     }
 }
