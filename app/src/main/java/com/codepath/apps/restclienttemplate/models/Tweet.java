@@ -19,15 +19,33 @@ public class Tweet {
     public String body;
     public String createdAt;
     public User user;
+    public boolean hasMedia;
+    public ArrayList<String> embeddedImages;
+    public String firstEmbeddedImage;
 
     // empty constructor for parcelable library
     public Tweet(){}
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
-        tweet.body = jsonObject.getString("text");
+        tweet.body = jsonObject.getString("full_text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+
+        JSONObject entities = jsonObject.getJSONObject("entities");
+        if (entities.has("media")){
+            JSONArray media = entities.getJSONArray("media");
+            tweet.hasMedia = true;
+            tweet.embeddedImages = new ArrayList<>();
+            for (int i=0; i<media.length(); i++){
+                tweet.embeddedImages.add(media.getJSONObject(i).getString("media_url_https"));
+            }
+            tweet.firstEmbeddedImage = tweet.embeddedImages.get(0);
+            Log.i("Tweet", "firstEmbeddedImage: " + tweet.firstEmbeddedImage);
+        } else {
+            tweet.hasMedia = false;
+            tweet.embeddedImages = new ArrayList<>();
+        }
         return tweet;
     }
 

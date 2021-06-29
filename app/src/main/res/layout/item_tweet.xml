@@ -48,4 +48,13 @@
         android:layout_marginBottom="3dp"
         android:layout_toEndOf="@+id/tvScreenName"
         tools:text="Time stamp" />
+
+    <ImageView
+        android:id="@+id/ivFirstEmbeddedImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/tvBody"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="5dp"
+        tools:srcCompat="@tools:sample/avatars" />
 </RelativeLayout>

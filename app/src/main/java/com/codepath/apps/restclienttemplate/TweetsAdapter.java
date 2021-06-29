@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import com.codepath.apps.restclienttemplate.models.Tweet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
@@ -70,6 +73,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvBody;
         TextView tvScreenName;
         TextView timeStamp;
+        ImageView ivFirstEmbeddedImage;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -77,6 +81,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             timeStamp = itemView.findViewById(R.id.timeStamp);
+            ivFirstEmbeddedImage = itemView.findViewById(R.id.ivFirstEmbeddedImage);
         }
 
         public void bind(Tweet tweet) {
@@ -84,6 +89,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvScreenName.setText(tweet.user.screenName);
             timeStamp.setText(tweet.getRelativeTimeAgo(tweet.createdAt));
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            if (tweet.hasMedia){
+                ivFirstEmbeddedImage.setVisibility(View.VISIBLE);
+                Log.i("TweetsAdapter","tweet has media");
+                Glide.with(context).load(tweet.firstEmbeddedImage).centerCrop().transform(new RoundedCornersTransformation(20, 5)).into(ivFirstEmbeddedImage);
+            } else {
+                ivFirstEmbeddedImage.setVisibility(View.GONE);
+            }
         }
     }
 }
