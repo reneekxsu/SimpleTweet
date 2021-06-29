@@ -67,5 +67,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="2dp"
         android:layout_toEndOf="@+id/ivProfileImage"
+        android:textStyle="bold"
         tools:text="Renee" />
 </RelativeLayout>
