@@ -33,6 +33,8 @@ public class TimelineActivity extends AppCompatActivity {
     List<Tweet> tweets;
     TweetsAdapter adapter;
 
+    MenuItem miActionProgressItem;
+
     private SwipeRefreshLayout swipeContainer;
 
     public static final String TAG = "TimelineActivity";
@@ -109,9 +111,21 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        Log.i("TimelineActivity","onPrepareOptionsMenu");
+        showProgressBar();
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // inflate the menu; adds items to action bar if present
         getMenuInflater().inflate(R.menu.menu_main,menu);
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        Log.i("TimelineActivity","onCreateOptionsMenu");
         return true;
     }
 
@@ -153,6 +167,7 @@ public class TimelineActivity extends AppCompatActivity {
                 try {
                     tweets.addAll(Tweet.fromJsonArray(jsonArray));
                     adapter.notifyDataSetChanged();
+                    hideProgressBar();
                 } catch (JSONException e) {
                     Log.e(TAG,"JSON exception", e);
                     e.printStackTrace();
@@ -164,6 +179,16 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.e(TAG,"onFailure populating timeline" + response,throwable);
             }
         });
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);
     }
 
     private void logOut(){
