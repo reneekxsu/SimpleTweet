@@ -24,7 +24,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/tvName"
-        tools:text="reneesu" />
+        tools:text="@reneesu" />
 
     <TextView
         android:id="@+id/tvBody"

@@ -45,13 +45,13 @@ public class ComposeActivity extends AppCompatActivity {
         btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String tweetContent = etCompose.getText().toString();
+                final String tweetContent = etCompose.getText().toString();
                 if (tweetContent.isEmpty()){
-                    Toast.makeText(ComposeActivity.this,"Sorry, your tweet can't be empty!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ComposeActivity.this,"Sorry, your tweet can't be empty!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (tweetContent.length() > MAX_TWEET_LENGTH) {
-                    Toast.makeText(ComposeActivity.this, "Sorry, your tweet is too long", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ComposeActivity.this, "Sorry, your tweet is too long", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_SHORT).show();
@@ -60,6 +60,7 @@ public class ComposeActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Log.i(TAG,"onSuccess to publish tweet");
+                        Log.i(TAG,"tweet Content: "+ tweetContent);
                         try {
                             Tweet tweet = Tweet.fromJson(json.jsonObject);
                             Log.i(TAG,"Published tweet says: " + tweet.body);
