@@ -21,9 +21,6 @@ import okhttp3.Headers;
 public class ComposeActivity extends AppCompatActivity {
 
     public static final int MAX_TWEET_LENGTH = 140;
-
-    // can use snackbar instead of toast
-
     public static final String TAG = "ComposeActivity";
 
     EditText etCompose;
@@ -54,7 +51,6 @@ public class ComposeActivity extends AppCompatActivity {
                     Toast.makeText(ComposeActivity.this, "Sorry, your tweet is too long", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_SHORT).show();
                 // make API call to twitter to publish tweet
                 client.publishTweet(tweetContent, new JsonHttpResponseHandler() {
                     @Override
@@ -81,6 +77,5 @@ public class ComposeActivity extends AppCompatActivity {
                 });
             }
         });
-
     }
 }

@@ -32,8 +32,7 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
-    long lowestID;
-    long maxID = 0;
+    long lowestID = 0;
 
     MenuItem miActionProgressItem;
 
@@ -57,6 +56,7 @@ public class TimelineActivity extends AppCompatActivity {
                 fetchTimelineAsync();
             }
         });
+
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -82,7 +82,6 @@ public class TimelineActivity extends AppCompatActivity {
         };
 
         rvTweets.addOnScrollListener(scrollListener);
-
         rvTweets.setAdapter(adapter);
 
         populateHomeTimeline();
@@ -120,7 +119,6 @@ public class TimelineActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    maxID = lowestID;
                     //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
                     adapter.notifyItemRangeInserted(0,len);
                 } catch (JSONException e) {
@@ -133,7 +131,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG,"onFailure populating timeline" + response,throwable);
             }
-        }, maxID - 1);
+        }, lowestID - 1);
     }
 
     public void fetchTimelineAsync() {
@@ -230,8 +228,7 @@ public class TimelineActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    maxID = lowestID;
-                    Log.i("TimelineActivity","maxID " + maxID);
+                    Log.i("TimelineActivity","smallest ID " + lowestID);
                     adapter.notifyDataSetChanged();
                     hideProgressBar();
                 } catch (JSONException e) {

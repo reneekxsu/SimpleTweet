@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -124,21 +123,16 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             btnFav.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Toast.makeText(context,"fav button pressed", Toast.LENGTH_SHORT).show();
-
                     if (tweet.favorite){
                         // unlike tweet
-                        Toast.makeText(context,"unlike", Toast.LENGTH_SHORT).show();
                         client.unFavTweet(tweet.id, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Headers headers, JSON json) {
                                 Log.i("TweetsAdapter","onSuccess to favorite tweet");
                                 btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart_stroke));
-//                                long subbedCount = tweet.favCount - 1;
                                 tweet.favCount--;
                                 tvFavCount.setText(tweet.favCount+"");
                                 tweet.favorite = false;
-//                                notifyDataSetChanged();
                                 try {
                                     Tweet tweet = Tweet.fromJson(json.jsonObject);
                                     Log.i("TweetsAdapter","Unfavorited tweet says: " + tweet.body);
@@ -155,17 +149,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         });
                     } else {
                         // like tweet
-                        Toast.makeText(context,"like", Toast.LENGTH_SHORT).show();
                         client.favTweet(tweet.id, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Headers headers, JSON json) {
                                 Log.i("TweetsAdapter","onSuccess to favorite tweet");
                                 btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart));
-//                                long addedCount = tweet.favCount + 1;
                                 tweet.favCount++;
                                 tvFavCount.setText(tweet.favCount + "");
-
-//                                notifyDataSetChanged();
                                 tweet.favorite = true;
                                 try {
                                     Tweet tweet = Tweet.fromJson(json.jsonObject);
