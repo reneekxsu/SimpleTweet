@@ -22,6 +22,11 @@ public class Tweet {
     public boolean hasMedia;
     public ArrayList<String> embeddedImages;
     public String firstEmbeddedImage;
+    public long id;
+    public long favCount;
+    public int retweetCount;
+    public boolean favorite;
+    public boolean retweet;
 
     // empty constructor for parcelable library
     public Tweet(){}
@@ -31,8 +36,14 @@ public class Tweet {
         tweet.body = jsonObject.getString("full_text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
-
+        tweet.id = jsonObject.getLong("id");
         JSONObject entities = jsonObject.getJSONObject("entities");
+        tweet.favCount = jsonObject.getLong("favorite_count");
+        Log.i("Tweet", "favorite count: " + tweet.favCount);
+        tweet.retweetCount = jsonObject.getInt("retweet_count");
+        tweet.favorite = jsonObject.getBoolean("favorited");
+        tweet.retweet = jsonObject.getBoolean("retweeted");
+
         if (entities.has("media")){
             JSONArray media = entities.getJSONArray("media");
             tweet.hasMedia = true;

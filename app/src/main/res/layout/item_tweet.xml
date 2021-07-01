@@ -4,69 +4,106 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_margin="0dp"
+    android:background="@drawable/textlines">
 
-    <ImageView
-        android:id="@+id/ivProfileImage"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+    <RelativeLayout
+        android:id="@+id/tweetContentContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/ivProfileImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tvScreenName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/tvName"
+            tools:text="\@reneesu" />
+
+        <TextView
+            android:id="@+id/tvBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvScreenName"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_toEndOf="@+id/ivProfileImage"
+            tools:text="Tweet contents." />
+
+        <TextView
+            android:id="@+id/timeStamp"
+            android:layout_width="157dp"
+            android:layout_height="31dp"
+            android:layout_above="@+id/tvBody"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/tvScreenName"
+            android:gravity="right"
+            android:paddingRight="5dp"
+            tools:text="Time stamp" />
+
+        <ImageView
+            android:id="@+id/ivFirstEmbeddedImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_below="@id/tvBody"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/ivProfileImage"
+            android:textStyle="bold"
+            tools:text="Renee" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnFavorite"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/tweetContentContainer"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="162dp"
         android:layout_marginTop="0dp"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/tvScreenName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="0dp"
-        android:layout_toEndOf="@+id/tvName"
-        tools:text="@reneesu" />
-
-    <TextView
-        android:id="@+id/tvBody"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvScreenName"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="2dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
-        tools:text="Tweet contents." />
-
-    <TextView
-        android:id="@+id/timeStamp"
-        android:layout_width="97dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tvBody"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
-        android:layout_toEndOf="@+id/tvScreenName"
-        android:gravity="right"
-        tools:text="Time stamp" />
-
-    <ImageView
-        android:id="@+id/ivFirstEmbeddedImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/tvBody"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="5dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:background="@drawable/ic_vector_heart"
+        android:backgroundTint="@color/inline_action_like" />
 
     <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/tvFavCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="2dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
-        android:textStyle="bold"
-        tools:text="Renee" />
+        android:layout_below="@+id/tweetContentContainer"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="0dp"
+        android:layout_toEndOf="@+id/btnFavorite"
+        tools:text="50" />
 </RelativeLayout>

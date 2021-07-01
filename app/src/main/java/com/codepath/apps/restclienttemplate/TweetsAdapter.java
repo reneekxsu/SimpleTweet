@@ -6,31 +6,39 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import okhttp3.Headers;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
 
     Context context;
     List<Tweet> tweets;
+    TwitterClient client;
+
 
     // pass in context and list of tweets
-    public TweetsAdapter(Context context, List<Tweet> tweets) {
+    public TweetsAdapter(Context context, List<Tweet> tweets, TwitterClient client) {
         this.context = context;
         this.tweets = tweets;
+        this.client = client;
     }
 
     @NonNull
@@ -77,6 +85,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView timeStamp;
         ImageView ivFirstEmbeddedImage;
         TextView tvName;
+        TextView tvFavCount;
+        Button btnFav;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -86,15 +96,19 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             timeStamp = itemView.findViewById(R.id.timeStamp);
             ivFirstEmbeddedImage = itemView.findViewById(R.id.ivFirstEmbeddedImage);
             tvName = itemView.findViewById(R.id.tvName);
+            tvFavCount = itemView.findViewById(R.id.tvFavCount);
+            btnFav = itemView.findViewById(R.id.btnFavorite);
+
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Tweet tweet) {
+        public void bind(final Tweet tweet) {
             tvBody.setText(tweet.body);
             tvScreenName.setText("@" + tweet.user.screenName);
             timeStamp.setText(tweet.getRelativeTimeAgo(tweet.createdAt));
             tvName.setText(tweet.user.name);
-            Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            tvFavCount.setText(Long.toString(tweet.favCount));
+            Glide.with(context).load(tweet.user.profileImageUrl).circleCrop().into(ivProfileImage);
             if (tweet.hasMedia) {
                 ivFirstEmbeddedImage.setVisibility(View.VISIBLE);
                 Log.i("TweetsAdapter", "tweet has media");
@@ -102,6 +116,74 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             } else {
                 ivFirstEmbeddedImage.setVisibility(View.GONE);
             }
+            if (tweet.favorite){
+                btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart));
+            } else {
+                btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart_stroke));
+            }
+            btnFav.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Toast.makeText(context,"fav button pressed", Toast.LENGTH_SHORT).show();
+
+                    if (tweet.favorite){
+                        // unlike tweet
+                        Toast.makeText(context,"unlike", Toast.LENGTH_SHORT).show();
+                        client.unFavTweet(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.i("TweetsAdapter","onSuccess to favorite tweet");
+                                btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart_stroke));
+//                                long subbedCount = tweet.favCount - 1;
+                                tweet.favCount--;
+                                tvFavCount.setText(tweet.favCount+"");
+                                tweet.favorite = false;
+//                                notifyDataSetChanged();
+                                try {
+                                    Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                    Log.i("TweetsAdapter","Unfavorited tweet says: " + tweet.body);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.e("TweetsAdapter","onFailure to unfavorite tweet",throwable);
+                            }
+                        });
+                    } else {
+                        // like tweet
+                        Toast.makeText(context,"like", Toast.LENGTH_SHORT).show();
+                        client.favTweet(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.i("TweetsAdapter","onSuccess to favorite tweet");
+                                btnFav.setBackground(context.getDrawable(R.drawable.ic_vector_heart));
+//                                long addedCount = tweet.favCount + 1;
+                                tweet.favCount++;
+                                tvFavCount.setText(tweet.favCount + "");
+
+//                                notifyDataSetChanged();
+                                tweet.favorite = true;
+                                try {
+                                    Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                    Log.i("TweetsAdapter","Favorited tweet says: " + tweet.body);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.e("TweetsAdapter","onFailure to favorite tweet",throwable);
+                            }
+                        });
+                    }
+                }
+            });
         }
 
         @Override

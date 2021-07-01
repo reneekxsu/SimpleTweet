@@ -32,10 +32,13 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
+    long lowestID;
+    long maxID = 0;
 
     MenuItem miActionProgressItem;
 
     private SwipeRefreshLayout swipeContainer;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     public static final String TAG = "TimelineActivity";
     private final int REQUEST_CODE = 20;
@@ -51,7 +54,7 @@ public class TimelineActivity extends AppCompatActivity {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchTimelineAsync(0);
+                fetchTimelineAsync();
             }
         });
         // Configure the refreshing colors
@@ -64,9 +67,22 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets = findViewById(R.id.rvTweets);
         // initialize list of tweets and adapter
         tweets = new ArrayList<>();
-        adapter = new TweetsAdapter(this,tweets);
+        adapter = new TweetsAdapter(this,tweets,client);
         // configure recycler view: layout manager and adapter
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvTweets.setLayoutManager(linearLayoutManager);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager){
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // triggered only when new data needs to be appended to list
+                // add whatever code is needed to append new items to bottom of list
+                loadNextDataFromApi();
+            }
+        };
+
+        rvTweets.addOnScrollListener(scrollListener);
+
         rvTweets.setAdapter(adapter);
 
         populateHomeTimeline();
@@ -81,7 +97,46 @@ public class TimelineActivity extends AppCompatActivity {
 
     }
 
-    public void fetchTimelineAsync(int page) {
+    // Append the next page of data into the adapter
+    public void loadNextDataFromApi() {
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        client.getHomeTimeline(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG,"onSuccess, loading more tweets" + json.toString());
+                //  --> Deserialize and construct new model objects from the API response
+                JSONArray jsonArray = json.jsonArray;
+                int len = jsonArray.length();
+                try {
+                    //  --> Append the new data objects to the existing set of items inside the array of items
+                    adapter.addAll(Tweet.fromJsonArray(jsonArray));
+                    for (int i=0; i<adapter.tweets.size(); i++){
+                        Log.i("TimelineActivity","currentID: "+ tweets.get(i).id);
+                        if (i == 0){
+                            lowestID = adapter.tweets.get(i).id;
+                        } else {
+                            if (adapter.tweets.get(i).id < lowestID){
+                                lowestID = adapter.tweets.get(i).id;
+                            }
+                        }
+                    }
+                    maxID = lowestID;
+                    //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+                    adapter.notifyItemRangeInserted(0,len);
+                } catch (JSONException e) {
+                    Log.e(TAG,"JSON exception", e);
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"onFailure populating timeline" + response,throwable);
+            }
+        }, maxID - 1);
+    }
+
+    public void fetchTimelineAsync() {
         // Send the network request to fetch the updated data
         // `client` here is an instance of Android Async HTTP
         // getHomeTimeline is an example endpoint.
@@ -107,7 +162,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.d("DEBUG", "Fetch timeline error: " + throwable);
             }
-        });
+        },0);
     }
 
     @Override
@@ -132,8 +187,6 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose) {
-            // compose icon is clicked
-//            Toast.makeText(this,"Compose",Toast.LENGTH_SHORT).show();
             // navigate to compose activity
             Intent intent = new Intent(this, ComposeActivity.class);
             startActivityForResult(intent, 20);
@@ -166,6 +219,19 @@ public class TimelineActivity extends AppCompatActivity {
                 JSONArray jsonArray = json.jsonArray;
                 try {
                     tweets.addAll(Tweet.fromJsonArray(jsonArray));
+                    // find smallest ID
+                    for (int i=0; i<tweets.size(); i++){
+                        Log.i("TimelineActivity","currentID: "+ tweets.get(i).id);
+                        if (i == 0){
+                            lowestID = tweets.get(i).id;
+                        } else {
+                            if (tweets.get(i).id < lowestID){
+                                lowestID = tweets.get(i).id;
+                            }
+                        }
+                    }
+                    maxID = lowestID;
+                    Log.i("TimelineActivity","maxID " + maxID);
                     adapter.notifyDataSetChanged();
                     hideProgressBar();
                 } catch (JSONException e) {
@@ -178,7 +244,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG,"onFailure populating timeline" + response,throwable);
             }
-        });
+        },0);
     }
 
     public void showProgressBar() {
